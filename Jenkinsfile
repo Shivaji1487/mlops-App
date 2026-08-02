@@ -7,13 +7,13 @@ pipeline {
         IMAGE_TAG              = "v1.0.${BUILD_NUMBER}"
         GITOPS_REPO            = 'github.com/Shivaji1487/mlops-gitops.git'
         
-        // Centralized Endpoints
+        // Endpoints
         MINIO_ENDPOINT         = 'http://192.168.235.130:9000'
         MLFLOW_S3_ENDPOINT_URL = 'http://192.168.235.130:9000'
         MLFLOW_TRACKING_URI    = 'http://192.168.235.130:5000'
         AWS_DEFAULT_REGION     = 'us-east-1'
         
-        // MinIO Credentials Mapping
+        // Credentials
         MINIO_CREDS            = credentials('s3credentials')
         AWS_ACCESS_KEY_ID      = "${MINIO_CREDS_USR}"
         AWS_SECRET_ACCESS_KEY  = "${MINIO_CREDS_PSW}"
@@ -69,7 +69,6 @@ pipeline {
             steps {
                 sh """
                     docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
-                    docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest .
                 """
             }
         }
@@ -77,12 +76,10 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'U', passwordVariable: 'P')]) {
-                    sh """
-                        echo '$P' | docker login -u '$U' --password-stdin
-                        docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
-                        docker logout
-                    """
+                    echo '\$P' | docker login -u '\$U' --password-stdin
+					docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+					docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
+					docker logout
                 }
             }
         }
