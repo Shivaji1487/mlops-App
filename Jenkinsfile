@@ -5,15 +5,14 @@ pipeline {
         DOCKER_HUB_USER        = 'sshivaji555'
         IMAGE_NAME             = 'mlops-app'
         IMAGE_TAG              = "v1.0.${BUILD_NUMBER}"
-        GITOPS_REPO            = 'github.com/Shivaji1487/mlops-gitops.git'
         
-        // Endpoints
+        // Centralized Endpoints
         MINIO_ENDPOINT         = 'http://192.168.235.130:9000'
         MLFLOW_S3_ENDPOINT_URL = 'http://192.168.235.130:9000'
         MLFLOW_TRACKING_URI    = 'http://192.168.235.130:5000'
         AWS_DEFAULT_REGION     = 'us-east-1'
         
-        // Credentials
+        // MinIO Credentials Mapping
         MINIO_CREDS            = credentials('s3credentials')
         AWS_ACCESS_KEY_ID      = "${MINIO_CREDS_USR}"
         AWS_SECRET_ACCESS_KEY  = "${MINIO_CREDS_PSW}"
@@ -69,6 +68,7 @@ pipeline {
             steps {
                 sh """
                     docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest .
                 """
             }
         }
@@ -88,22 +88,27 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
-                        sh """
+                        sh '''
                             rm -rf mlops-gitops
-                            git clone https://${GIT_USER}:${GIT_TOKEN}@${GITOPS_REPO}
-                            
+
+                            git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/Shivaji1487/mlops-gitops.git
+
                             cd mlops-gitops/applications/helm
-                            
-                            # Update image tag in values.yaml
-                            sed -i 's/tag: .*/tag: "${IMAGE_TAG}"/' values.yaml
-                            
-                            git config user.email "jenkins@ci.com"
+
                             git config user.name "Jenkins CI"
-                            
+                            git config user.email "jenkins@local"
+
+                            sed -i "s|repository: .*|repository: sshivaji555/mlops-app|g" values.yaml
+                            sed -i "s|tag: .*|tag: ${IMAGE_TAG}|g" values.yaml
+
                             git add values.yaml
-                            git commit -m "chore(gitops): update image tag to ${IMAGE_TAG} [skip ci]"
+
+                            git commit -m "Deploy Image ${IMAGE_TAG}" || true
+
+                            git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/Shivaji1487/mlops-gitops.git
+
                             git push origin main
-                        """
+                        '''
                     }
                 }
             }
