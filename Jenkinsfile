@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER        = 'shivaji1487'
+        DOCKER_HUB_USER        = 'sshivaji555'
         IMAGE_NAME             = 'mlops-app'
         IMAGE_TAG              = "v1.0.${BUILD_NUMBER}"
         GITOPS_REPO            = 'github.com/Shivaji1487/mlops-gitops.git'
