@@ -41,7 +41,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    pytest test/
+                    python -m pytest test/
                 '''
             }
         }
@@ -50,7 +50,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    python src/validate.py
+                    python -m src.validate
                 '''
             }
         }
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    python src/train.py
+                    python -m src.train
                 '''
             }
         }
