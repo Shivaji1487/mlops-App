@@ -4,7 +4,7 @@ import mlflow
 import mlflow.pyfunc
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import accuracy_score  # 1. Metric import karein
-from validate import validate_data
+from src.validate import validate_data
 
 # Config & S3 Setup
 MINIO_ENDPOINT = os.getenv("MLFLOW_S3_ENDPOINT_URL", "http://192.168.235.130:9000")
