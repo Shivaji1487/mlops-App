@@ -76,10 +76,10 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'U', passwordVariable: 'P')]) {
-                    echo '\$P' | docker login -u '\$U' --password-stdin
-					docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-					docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
-					docker logout
+                    sh 'echo "$P" | docker login -u "$U" --password-stdin'
+                    sh 'docker push ' + DOCKER_HUB_USER + '/' + IMAGE_NAME + ':' + IMAGE_TAG
+                    sh 'docker push ' + DOCKER_HUB_USER + '/' + IMAGE_NAME + ':latest'
+                    sh 'docker logout'
                 }
             }
         }
