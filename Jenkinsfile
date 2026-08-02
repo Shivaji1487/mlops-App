@@ -13,8 +13,8 @@ pipeline {
         MLFLOW_TRACKING_URI    = 'http://192.168.235.130:5000'
 		
 		// MinIO Credentials fetched safely from Jenkins Credentials Store
-        AWS_ACCESS_KEY_ID     = credentials('s3credentials_USR')
-        AWS_SECRET_ACCESS_KEY = credentials('s3credentials_PSW')
+        AWS_ACCESS_KEY_ID     = credentials('s3credentials')
+        AWS_SECRET_ACCESS_KEY = credentials('s3credentials')
     }
 
     stages {
