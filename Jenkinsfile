@@ -13,7 +13,7 @@ pipeline {
         MLFLOW_TRACKING_URI    = 'http://192.168.235.130:5000'
         AWS_DEFAULT_REGION     = 'us-east-1'
         
-        // MinIO Credentials Mapping (Industry Standard)
+        // MinIO Credentials Mapping
         MINIO_CREDS            = credentials('s3credentials')
         AWS_ACCESS_KEY_ID      = "${MINIO_CREDS_USR}"
         AWS_SECRET_ACCESS_KEY  = "${MINIO_CREDS_PSW}"
@@ -74,16 +74,15 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push to DockerHub') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
-                            echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-                            docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-                            docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
-                        """
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'U', passwordVariable: 'P')]) {
+                    sh """
+                        echo '$P' | docker login -u '$U' --password-stdin
+                        docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
+                        docker logout
+                    """
                 }
             }
         }
