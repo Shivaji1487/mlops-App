@@ -2,19 +2,21 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'shivaji1487'
-        IMAGE_NAME      = 'mlops-app'
-        IMAGE_TAG       = "v1.0.${BUILD_NUMBER}"
-        GITOPS_REPO     = 'github.com/Shivaji1487/mlops-gitops.git'
-		
-		// Centralized Endpoints
+        DOCKER_HUB_USER        = 'shivaji1487'
+        IMAGE_NAME             = 'mlops-app'
+        IMAGE_TAG              = "v1.0.${BUILD_NUMBER}"
+        GITOPS_REPO            = 'github.com/Shivaji1487/mlops-gitops.git'
+        
+        // Centralized Endpoints
         MINIO_ENDPOINT         = 'http://192.168.235.130:9000'
         MLFLOW_S3_ENDPOINT_URL = 'http://192.168.235.130:9000'
         MLFLOW_TRACKING_URI    = 'http://192.168.235.130:5000'
-		
-		// MinIO Credentials fetched safely from Jenkins Credentials Store
-        AWS_ACCESS_KEY_ID     = credentials('s3credentials')
-        AWS_SECRET_ACCESS_KEY = credentials('s3credentials')
+        AWS_DEFAULT_REGION     = 'us-east-1'
+        
+        // MinIO Credentials Mapping (Industry Standard)
+        MINIO_CREDS            = credentials('s3credentials')
+        AWS_ACCESS_KEY_ID      = "${MINIO_CREDS_USR}"
+        AWS_SECRET_ACCESS_KEY  = "${MINIO_CREDS_PSW}"
     }
 
     stages {
